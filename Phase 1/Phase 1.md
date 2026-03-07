@@ -135,14 +135,15 @@ Nicholas Martoccia
 - Physicians ↔ Admissions: many-to-many
 
 ## ER Diagram
-![ER Diagram](ER_Model.svg)
+![ER Diagram](images/ER_Model.svg)
 
 ---
 
 # Task 2 — Database Creation and Data Import
 
-## Schema Design
-![alt text](image.png)
+## Database Schema
+
+![Database Schema](images/database_schema.png)
 ---
 
 # Task 3 — SQL Queries
@@ -150,18 +151,28 @@ Nicholas Martoccia
 ## Query 1
 List all patients who were admitted to the ICU and whose first care unit and last care unit were both “MICU”.
 ```sql
-SELECT P.FIRST_NAME, P.LAST_NAME, I.ICUSTAY_ID, I.FIRST_CAREUNIT, I.LAST_CAREUNIT
+SELECT 
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    I.ICUSTAY_ID, 
+    I.FIRST_CAREUNIT, 
+    I.LAST_CAREUNIT
 FROM PATIENTS P
 JOIN dbo.ICUSTAYS I
     ON P.SUBJECT_ID = I.SUBJECT_ID
-WHERE I.FIRST_CAREUNIT = 'MICU' AND I.LAST_CAREUNIT = 'MICU';
+WHERE 
+    I.FIRST_CAREUNIT = 'MICU' AND I.LAST_CAREUNIT = 'MICU';
 ```
 ### Comments
 We have been asked to list all patients who were admitted to the ICU and for whom both the first and last care units were the MICU. To filter the correct patients, we first need to identify which patients were admitted to the ICU and then narrow it down to those admitted to the MICU. By joining the patient table with the ICU stays table, we can determine which patients were admitted to the ICU. The only thing left to do is filter by which patients had the MICU as their first and last care unit.
 ## Query 2
  Find all patients who had more than 3 hospital admissions in total.
 ```sql
-SELECT P.SUBJECT_ID, P.FIRST_NAME, P.LAST_NAME, COUNT(*) AS admission_count
+SELECT 
+    P.SUBJECT_ID, 
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    COUNT(*) AS admission_count
 FROM PATIENTS P
 INNER JOIN dbo.ADMISSIONS A ON P.SUBJECT_ID = A.SUBJECT_ID
 GROUP BY P.SUBJECT_ID, P.FIRST_NAME, P.LAST_NAME
@@ -173,7 +184,10 @@ First, we need to identify which patients have had more than three hospital admi
 Retrieve the names and admission dates of patients who were discharged without any procedures.
 ```sql
 SELECT
-    p.FIRST_NAME, p.LAST_NAME, a.ADMISSION_TYPE, a.ADMITTIME
+    p.FIRST_NAME, 
+    p.LAST_NAME, 
+    a.ADMISSION_TYPE, 
+    a.ADMITTIME
 FROM PATIENTS p INNER JOIN ADMISSIONS a
      ON p.SUBJECT_ID = a.SUBJECT_ID
 WHERE EXISTS(
@@ -212,7 +226,11 @@ To identify patients who underwent both radiology exams and surgery during the s
 Find all ICU stays that lasted more than 7 days and the associated patient names.
 ```sql
 SELECT
-    P.FIRST_NAME, P.LAST_NAME, I.INTIME, I.OUTTIME, DATEDIFF(day, I.INTIME, I.OUTTIME) AS icu_stay_days
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    I.INTIME, 
+    I.OUTTIME, 
+    DATEDIFF(day, I.INTIME, I.OUTTIME) AS icu_stay_days
 FROM dbo.PATIENTS P
 JOIN dbo.ICUSTAYS I
     ON P.SUBJECT_ID = I.SUBJECT_ID
@@ -224,7 +242,8 @@ To get all ICU stays that lasted more than seven days and the associated patient
 Count the number of admissions for each patient.
 ```sql
 SELECT
-    SUBJECT_ID,  COUNT(HADM_ID) AS admission_count
+    SUBJECT_ID,  
+    COUNT(HADM_ID) AS admission_count
 FROM dbo.ADMISSIONS
 GROUP BY SUBJECT_ID;
 ```
@@ -248,7 +267,8 @@ We were asked to identify all patients who were admitted via the emergency depar
  Retrieve the most common diagnosis (ICD code) in ICU admissions.
 ```sql
 SELECT TOP 1
-    D.ICD9_CODE, COUNT(*) AS diagnosis_count
+    D.ICD9_CODE, 
+    COUNT(*) AS diagnosis_count
 FROM dbo.ICUSTAYS I
 JOIN dbo.ADMISSIONS A
     ON I.HADM_ID = A.HADM_ID
@@ -263,7 +283,8 @@ To find the most common diagnosis, we need to count the number of times a diagno
 Find the average length of stay in the ICU for each ICU type (e.g., MICU, SICU, CCU).
 ```sql
 SELECT
-    FIRST_CAREUNIT AS icu_type, AVG(DATEDIFF(hour, INTIME, OUTTIME) / 24.0) AS avg_icu_stay_days
+    FIRST_CAREUNIT AS icu_type, 
+    AVG(DATEDIFF(hour, INTIME, OUTTIME) / 24.0) AS avg_icu_stay_days
 FROM dbo.ICUSTAYS
 WHERE OUTTIME IS NOT NULL
 GROUP BY FIRST_CAREUNIT;
@@ -274,7 +295,9 @@ To find the average length of time a patient stayed in the ICU, we need to use t
 List all patients who had surgery before being admitted to the ICU in the same admission.
 ```sql
 SELECT DISTINCT
-    p.FIRST_NAME, p.LAST_NAME, a.HADM_ID
+    p.FIRST_NAME, 
+    p.LAST_NAME, 
+    a.HADM_ID
 FROM PATIENTS p
 INNER JOIN ADMISSIONS a
     ON p.SUBJECT_ID = a.SUBJECT_ID
@@ -298,7 +321,9 @@ We are looking for patients who underwent surgery prior to being admitted to the
  Retrieve the names of patients and the number of radiology exams they had during all admissions.
 ```sql
 SELECT
-    P.FIRST_NAME, P.LAST_NAME, COUNT(*) AS radiology_exam_count
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    COUNT(*) AS radiology_exam_count
 FROM dbo.PATIENTS P
 JOIN dbo.ADMISSIONS A
     ON P.SUBJECT_ID = A.SUBJECT_ID
@@ -314,7 +339,8 @@ First, we select the patients first and last name from the Patients table and a 
 Find patients who had discharge summaries containing the keyword “recovery”.
 ```sql
 SELECT DISTINCT
-    P.FIRST_NAME, P.LAST_NAME
+    P.FIRST_NAME, 
+    P.LAST_NAME
 FROM dbo.PATIENTS P
 JOIN dbo.ADMISSIONS A
     ON P.SUBJECT_ID = A.SUBJECT_ID
@@ -329,7 +355,9 @@ First, we select distinct names from the Patients table. To find discharge summa
 List all admissions where the patient had no ICU/CCU stay but had radiology exams performed.
 ```sql
 SELECT DISTINCT
-    P.FIRST_NAME, P.LAST_NAME, A.HADM_ID
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    A.HADM_ID
 FROM dbo.ADMISSIONS A
 JOIN dbo.PATIENTS P
     ON A.SUBJECT_ID = P.SUBJECT_ID
@@ -351,7 +379,11 @@ The query can be broken into two parts: first, find the admissions of patients w
 Retrieve the patients with the longest hospital stay (admission to discharge).
 ```sql
 SELECT TOP 10
-    P.FIRST_NAME, P.LAST_NAME, A.ADMITTIME, A.DISCHTIME, DATEDIFF(day, A.ADMITTIME, A.DISCHTIME) AS days_at_the_hospital
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    A.ADMITTIME, 
+    A.DISCHTIME, 
+    DATEDIFF(day, A.ADMITTIME, A.DISCHTIME) AS days_at_the_hospital
 FROM dbo.ADMISSIONS A
 JOIN dbo.PATIENTS P
     ON A.SUBJECT_ID = P.SUBJECT_ID
@@ -366,7 +398,10 @@ To find the top patients, we need to order by this calculated time and display t
 Count the total number of ICU transfers for each patient.
 ```sql
 SELECT
-    P.FIRST_NAME, P.LAST_NAME, I.SUBJECT_ID, COUNT(I.ICUSTAY_ID) AS icu_count
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    I.SUBJECT_ID, 
+    COUNT(I.ICUSTAY_ID) AS icu_count
 FROM dbo.ICUSTAYS I
 JOIN dbo.PATIENTS P
     ON I.SUBJECT_ID = P.SUBJECT_ID
@@ -380,7 +415,11 @@ We can calculate the total number of ICU transfers for each patient by selecting
 List patients who were admitted to multiple ICU types during the same admission.
 ```sql
 SELECT
-    P.FIRST_NAME, P.LAST_NAME, I.SUBJECT_ID, I.HADM_ID, COUNT(DISTINCT I.FIRST_CAREUNIT) AS icu_type_count
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    I.SUBJECT_ID, 
+    I.HADM_ID, 
+    COUNT(DISTINCT I.FIRST_CAREUNIT) AS icu_type_count
 FROM dbo.ICUSTAYS I
 JOIN dbo.PATIENTS P
     ON I.SUBJECT_ID = P.SUBJECT_ID
@@ -394,7 +433,11 @@ First, we need to select the subject ID, hospital admission ID, and the number o
 Find all patients who had more than one diagnosis coded during a single admission.
 ```sql
 SELECT
-    P.FIRST_NAME, P.LAST_NAME, D.SUBJECT_ID, D.HADM_ID, COUNT(*) AS diagnosis_count
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    D.SUBJECT_ID, 
+    D.HADM_ID, 
+    COUNT(*) AS diagnosis_count
 FROM dbo.DIAGNOSES_ICD D
 JOIN dbo.PATIENTS P
     ON D.SUBJECT_ID = P.SUBJECT_ID
@@ -409,7 +452,13 @@ To find all patients with more than one coded diagnosis during a single admissio
 Retrieve the latest clinical note for each patient.
 ```sql
 SELECT
-    P.FIRST_NAME, P.LAST_NAME, N.SUBJECT_ID, N.HADM_ID, N.CHARTTIME, N.CATEGORY, N.TEXT
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    N.SUBJECT_ID, 
+    N.HADM_ID, 
+    N.CHARTTIME, 
+    N.CATEGORY, 
+    N.TEXT
 FROM dbo.NOTEEVENTS N
 JOIN dbo.PATIENTS P
     ON N.SUBJECT_ID = P.SUBJECT_ID
@@ -425,7 +474,12 @@ We are asked to retrieve the most recent clinical note for each patient. First, 
 List all admissions where the patient died during the stay.
 ```sql
 SELECT
-    P.FIRST_NAME, P.LAST_NAME, A.HADM_ID, A.SUBJECT_ID, A.ADMITTIME, A.DISCHTIME
+    P.FIRST_NAME, 
+    P.LAST_NAME, 
+    A.HADM_ID, 
+    A.SUBJECT_ID, 
+    A.ADMITTIME, 
+    A.DISCHTIME
 FROM dbo.ADMISSIONS A
 JOIN dbo.PATIENTS P
     ON A.SUBJECT_ID = P.SUBJECT_ID
@@ -437,7 +491,9 @@ By filtering admissions with a hospital expire flag of 1, we can get the list al
 Find all patients who had surgery and radiology exams on the same day.
 ```sql
 SELECT DISTINCT
-    p.FIRST_NAME, p.LAST_NAME, a.HADM_ID
+    p.FIRST_NAME, 
+    p.LAST_NAME, 
+    a.HADM_ID
 FROM PATIENTS p
 INNER JOIN ADMISSIONS a
     ON p.SUBJECT_ID = a.SUBJECT_ID
