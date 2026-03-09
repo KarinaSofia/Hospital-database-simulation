@@ -6,7 +6,7 @@
 **Contributors:**  
 Fouad Elian  
 Junior Boni  
-Talar Mustafa  
+Talar Mustafa (40284214) 
 Karina Evangelista   
 Nicholas Martoccia  
 
