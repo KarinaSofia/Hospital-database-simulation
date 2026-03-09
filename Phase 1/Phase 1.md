@@ -135,7 +135,7 @@ Nicholas Martoccia (...)
 - Physicians ↔ Admissions: many-to-many
 
 ## ER Diagram
-![ER Diagram](images/ER_Model.svg)
+![ER Diagram](images/ER_Model.v1.svg)
 
 ---
 
