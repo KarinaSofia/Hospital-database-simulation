@@ -8,7 +8,7 @@ Fouad Elian (40273045)
 Junior Boni (40287501)  
 Talar Mustafa (40284214)  
 Karina Evangelista (40308529)  
-Nicholas Martoccia (...)
+Nicholas Martoccia (40303643)
 
 ---
 
